@@ -1,5 +1,6 @@
-use std::fs;
-use std::error::Error;
+use std::{
+    fs,error::Error
+};
 
 pub struct Config {
     pub query: String,
@@ -48,5 +49,19 @@ Rust:
 safe, fast, productive.
 Pick three.";
         assert_eq!(vec!["safe, fast, productive."], search(query, contents));
+    }
+    #[test]
+    fn correct_filename() {
+        let args:Vec<String> = vec![String::from("callingprogram"),String::from("query"),String::from("filename")];
+        let result = Config::new(&args);
+
+        assert_eq!(result.unwrap().filename,String::from("filename"));
+    }
+    #[test]
+    fn correct_query() {
+        let args:Vec<String> = vec![String::from("callingprogram"),String::from("query"),String::from("filename")];
+        let result = Config::new(&args);
+
+        assert_eq!(result.unwrap().query,String::from("query"));
     }
 }
