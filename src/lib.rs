@@ -20,8 +20,8 @@ impl Config {
 
 pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
     let contents = fs::read_to_string(config.filename)?;
-    for line in search(&config.query, &contents){
-        println!("{}", line);
+    for _line in search(&config.query, &contents){
+        //println!("{}", line);
     }
     Ok(())
 }
@@ -51,17 +51,32 @@ Pick three.";
         assert_eq!(vec!["safe, fast, productive."], search(query, contents));
     }
     #[test]
-    fn correct_filename() {
+    fn correct_config() {
         let args:Vec<String> = vec![String::from("callingprogram"),String::from("query"),String::from("filename")];
         let result = Config::new(&args);
 
-        assert_eq!(result.unwrap().filename,String::from("filename"));
+        assert_eq!(result.is_ok(),true);
     }
     #[test]
-    fn correct_query() {
-        let args:Vec<String> = vec![String::from("callingprogram"),String::from("query"),String::from("filename")];
-        let result = Config::new(&args);
-
-        assert_eq!(result.unwrap().query,String::from("query"));
+    fn incorrect_config() {
+        let args:Vec<String> = vec![String::from("callingprogram"),String::from("query")];
+        if let Err(error) = Config::new(&args) {
+            assert_eq!(error, String::from("Not enough arguments"));
+        } else {
+            panic!("Config returned OK instead of Error");
+        }
+    }
+    #[test]
+    fn file_open_success() {
+        let args:Vec<String> = vec![String::from("target\\debug\\rust_minigrep.exe"),String::from("body"),String::from("poem.txt")];
+        let config = Config::new(&args);
+        let result = run(config.unwrap());
+        assert_eq!(result.is_ok(), true);
+    }
+    #[test]
+    fn file_not_found() {
+        let args:Vec<String> = vec![String::from("target\\debug\\rust_minigrep.exe"),String::from("body"),String::from("poem.tx")];
+        let config = Config::new(&args);
+        assert_eq!(run(config.unwrap()).is_err(), true);
     }
 }
